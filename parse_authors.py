@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Parse a large Facebook chat export HTML file to extract unique authors
+Parse a large Facebook chat export HTML file to extract unique author/id pairs
 and the page numbers where each appears.
 
-Streams the file line-by-line to handle multi-GB inputs without
-loading everything into memory. Does not use lxml.
+Streams the file line-by-line.
 """
 
 import argparse
