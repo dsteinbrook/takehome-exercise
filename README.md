@@ -7,4 +7,4 @@
 
 The script has an optional command line argument -n <max_lines> (e.g. python3 -n 1000) to parse the first 1000 lines only of the data file. If omitted it will parse the entire file.
 
-Note: some of the author names in the data file were commented out (e.g. <!--Author: Emily Chen (Facebook: 777777777777777)-->) and I chose to omit these from the output result.
+Note: some of the author names in the data file were commented out (e.g. `<!--Author: Emily Chen (Facebook: 777777777777777)-->`) and I chose to omit these from the output result.
