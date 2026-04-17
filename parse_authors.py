@@ -16,6 +16,8 @@ from collections import defaultdict
 DATA_FILE = "data/huge_chat_export.html"
 OUTPUT_FILE = "output.txt"
 
+# Handles four page-marker variants: "Page Numbers N", "Page Numbers: N",
+# "Page N" (no "Numbers" word), and the lowercase "page numbers N".
 PAGE_RE = re.compile(
     r"Page\s+(?:Numbers[\s:]+)?(\d+)", re.IGNORECASE
 )
@@ -26,9 +28,7 @@ AUTHOR_DIV_RE = re.compile(
 AUTHOR_MSG_RE = re.compile(
     r'class="author">\s*(.*?)\s*\(Facebook:\s*(\d+)\)'
 )
-AUTHOR_COMMENT_RE = re.compile(
-    r"<!--\s*Author:\s*(.*?)\s*\(Facebook:\s*(\d+)\)\s*-->"
-)
+
 AUTHOR_SPAN_RE = re.compile(
     r"Message from\s+(.*?)\s*\(Facebook:\s*(\d+)\)"
 )
@@ -38,7 +38,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-n", "--max-lines", type=int, default=None,
-        help="Stop after reading this many lines (default: read entire file)",
     )
     args = parser.parse_args()
 
@@ -55,10 +54,9 @@ def main():
             if lines_processed % 10_000_000 == 0:
                 elapsed = time.time() - t0
                 print(
-                    f"  {lines_processed / 1e6:.0f}M lines  "
-                    f"({elapsed:.1f}s elapsed, "
-                    f"{len(authors):,} unique authors so far)",
-                    file=sys.stderr,
+                    f"  {lines_processed} lines  "
+                    f"({elapsed}s elapsed ",
+                    file=sys.stdout,
                 )
 
             lower = line.lower()
@@ -67,8 +65,9 @@ def main():
                 if m:
                     current_page = int(m.group(1))
 
+            # Skip authors before the first page marker (file header / Current Participants).
             if current_page is not None and "Facebook:" in line:
-                for pattern in (AUTHOR_DIV_RE, AUTHOR_MSG_RE, AUTHOR_COMMENT_RE, AUTHOR_SPAN_RE):
+                for pattern in (AUTHOR_DIV_RE, AUTHOR_MSG_RE, AUTHOR_SPAN_RE):
                     for name, fb_id in pattern.findall(line):
                         name = name.strip()
                         if name:
@@ -88,10 +87,10 @@ def main():
 
     print(
         f"\nTotal unique authors: {len(authors):,}",
-        file=sys.stderr,
+        file=sys.stdout,
     )
-    print(f"Processed {lines_processed:,} lines in {elapsed:.1f}s", file=sys.stderr)
-    print(f"Results written to {OUTPUT_FILE}", file=sys.stderr)
+    print(f"Processed {lines_processed:,} lines in {elapsed}s", file=sys.stdout)
+    print(f"Results written to {OUTPUT_FILE}", file=sys.stdout)
 
 
 if __name__ == "__main__":
